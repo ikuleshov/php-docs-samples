@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-// [START functions_imagemagick_analyze]
-
+// [START functions_imagemagick_setup]
 use Google\CloudFunctions\CloudEvent;
 use Google\Cloud\Storage\StorageClient;
 use Google\Cloud\Vision\V1\Feature\Type;
 use Google\Cloud\Vision\V1\ImageAnnotatorClient;
 
 define('VERY_LIKELY', 5);
+// [END functions_imagemagick_setup]
+
+// [START functions_imagemagick_analyze]
 
 function blurOffensiveImages(CloudEvent $cloudevent): void
 {
