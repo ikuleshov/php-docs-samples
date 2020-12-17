@@ -50,15 +50,16 @@ class DeployTest extends TestCase
     private static $functionSignatureType = 'cloudevent';
 
     /** @var string */
-    // The test copies images from here...
+    // The test starts by copying images from this bucket.
     private static $FIXTURE_SOURCE_BUCKET = 'cloud-devrel-public';
 
     /** @var string */
-    // ...to here. The Cloud Function itself will upload blurred images...
+    // This is the bucket the deployed function monitors.
+    // The test copies image from FIXTURE_SOURCE_BUCKET to this one.
     private static $MONITORED_BUCKET;
 
     /** @var string */
-    // ...to here.
+    // The function saves any blurred images to this bucket.
     private static $BLURRED_BUCKET;
 
     /** @var StorageClient */
