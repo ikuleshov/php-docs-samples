@@ -17,8 +17,7 @@
 <phpunit bootstrap="../../testing/bootstrap.php" convertWarningsToExceptions="false">
     <testsuites>
         <testsuite name="Cloud Functions ImageMagick Test Suite">
-            <directory>.</directory>
-            <exclude>vendor</exclude>
+            <directory>test</directory>
         </testsuite>
     </testsuites>
     <logging>

@@ -72,7 +72,6 @@ class DeployTest extends TestCase
       */
     public function testFunction(
         $cloudevent,
-        $data,
         $label,
         $fileName,
         $expected,
@@ -81,13 +80,6 @@ class DeployTest extends TestCase
         // Upload target file.
         $fixtureBucket = self::$storageClient->bucket(self::$FIXTURE_SOURCE_BUCKET);
         $object = $fixtureBucket->object($fileName);
-
-        // Ignore the "missing files" test case
-        // (That test is integration-only, as triggering
-        // GCS requires a file to be present.)
-        if (!$object->exists()) {
-            $this->markTestSkipped('Missing-files-case cannot be tested on GCF itself.');
-        }
 
         $object->copy(self::$MONITORED_BUCKET, ['name' => $fileName]);
 

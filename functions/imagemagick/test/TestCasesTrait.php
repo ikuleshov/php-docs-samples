@@ -18,6 +18,8 @@ declare(strict_types=1);
 
 namespace Google\Cloud\Samples\Functions\ImageMagick\Test;
 
+use Google\CloudFunctions\CloudEvent;
+
 trait TestCasesTrait
 {
     public static function getDataForFile($fileName): array
@@ -32,42 +34,60 @@ trait TestCasesTrait
         ];
     }
 
+
+
     public static function cases(): array
     {
         $START_BUCKET_NAME = getenv('FUNCTIONS_BUCKET');
         $BLURRED_BUCKET_NAME = getenv('BLURRED_BUCKET_NAME');
 
-        $cloudevent = [
-            'id' => uniqid(),
-            'source' => 'storage.googleapis.com',
-            'specversion' => '1.0',
-            'type' => 'google.cloud.storage.object.v1.finalized',
-            'statusCode' => '200'
-        ];
-
         return [
             [
-                'cloudevent' => $cloudevent,
-                'data' => TestCasesTrait::getDataForFile('puppies.jpg'),
+                'cloudevent' => CloudEvent::fromArray([
+                    'id' => uniqid(),
+                    'source' => 'storage.googleapis.com',
+                    'specversion' => '1.0',
+                    'type' => 'google.cloud.storage.object.v1.finalized',
+                    'data' => TestCasesTrait::getDataForFile('puppies.jpg'),
+                ]),
                 'label' => 'Ignores safe images',
                 'fileName' => 'puppies.jpg',
                 'expected' => 'Detected puppies.jpg as OK',
                 'statusCode' => '200'
             ],
             [
-                'cloudevent' => $cloudevent,
-                'data' => TestCasesTrait::getDataForFile('zombie.jpg'),
+                'cloudevent' => CloudEvent::fromArray([
+                    'id' => uniqid(),
+                    'source' => 'storage.googleapis.com',
+                    'specversion' => '1.0',
+                    'type' => 'google.cloud.storage.object.v1.finalized',
+                    'data' => TestCasesTrait::getDataForFile('zombie.jpg'),
+                ]),
                 'label' => 'Blurs offensive images',
                 'fileName' => 'zombie.jpg',
                 'expected' => sprintf(
-                    'Uploaded blurred image to: gs://%s/zombie.jpg',
+                    'Streamed blurred image to: gs://%s/zombie.jpg',
                     $BLURRED_BUCKET_NAME
                 ),
                 'statusCode' => '200'
             ],
+        ];
+    }
+
+    public static function integrationCases(): array
+    {
+        $START_BUCKET_NAME = getenv('FUNCTIONS_BUCKET');
+        $BLURRED_BUCKET_NAME = getenv('BLURRED_BUCKET_NAME');
+
+        return [
             [
-                'cloudevent' => $cloudevent,
-                'data' => TestCasesTrait::getDataForFile('does-not-exist.jpg'),
+                'cloudevent' => CloudEvent::fromArray([
+                    'id' => uniqid(),
+                    'source' => 'storage.googleapis.com',
+                    'specversion' => '1.0',
+                    'type' => 'google.cloud.storage.object.v1.finalized',
+                    'data' => TestCasesTrait::getDataForFile('does-not-exist.jpg')
+                ]),
                 'label' => 'Labels missing images as safe',
                 'filename' => 'does-not-exist.jpg',
                 'expected' => sprintf(

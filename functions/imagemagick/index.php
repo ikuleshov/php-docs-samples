@@ -19,10 +19,9 @@
 use Google\CloudFunctions\CloudEvent;
 use Google\Cloud\Storage\StorageClient;
 use Google\Cloud\Vision\V1\ImageAnnotatorClient;
+use Google\Cloud\Vision\V1\Likelihood;
 
-define('VERY_LIKELY', 5);
 // [END functions_imagemagick_setup]
-
 
 // [START functions_imagemagick_analyze]
 function blurOffensiveImages(CloudEvent $cloudevent): void
@@ -49,9 +48,10 @@ function blurOffensiveImages(CloudEvent $cloudevent): void
             return;
         }
 
+        $VERY_LIKELY = 5; // constant used by vision API
         $is_inappropriate =
-            $response->getAdult() === VERY_LIKELY ||
-            $response->getViolence() === VERY_LIKELY;
+            $response->getAdult() === Likelihood::VERY_LIKELY ||
+            $response->getViolence() === Likelihood::VERY_LIKELY;
 
         if ($is_inappropriate) {
             fwrite($log, 'Detected ' . $data['name'] . ' as inappropriate.' . PHP_EOL);
@@ -78,43 +78,30 @@ function blurImage(
     $tempLocalPath = sys_get_temp_dir() . '/' . $file->name();
 
     // Download file from bucket.
+    $image = new Imagick();
     try {
-        $file->downloadToFile($tempLocalPath);
-
-        fwrite($log, 'Downloaded ' . $file->name() . ' to: ' . $tempLocalPath . PHP_EOL);
+        $image->readImageBlob($file->downloadAsStream());
     } catch (Exception $e) {
-        throw new Exception('File download failed: ' . $e);
+        throw new Exception('Streaming download failed: ' . $e);
     }
 
     // Blur file using ImageMagick
     // (The Imagick class is from the PECL 'imagick' package)
-    $image = new Imagick($tempLocalPath);
     $image->blurImage(0, 16);
 
-    try {
-        $image->writeImage($tempLocalPath);
-
-        fwrite($log, 'Blurred image: ' . $file->name() . PHP_EOL);
-    } catch (Exception $e) {
-        fwrite($log, 'Failed to blur image: ' . $e->getMessage() . PHP_EOL);
-    }
-
-    // Upload result to a different bucket, to avoid re-triggering this function.
+    // Stream blurred image result to a different bucket. // (This avoids re-triggering this function.)
     $storage = new StorageClient();
     $blurredBucket = $storage->bucket($blurredBucketName);
 
     // Upload the Blurred image back into the bucket.
     $gcsPath = 'gs://' . $blurredBucketName . '/' . $file->name();
     try {
-        $blurredBucket->upload($tempLocalPath, [
+        $blurredBucket->upload($image->getImageBlob(), [
             'name' => $file->name()
         ]);
-        fwrite($log, 'Uploaded blurred image to: ' . $gcsPath . PHP_EOL);
+        fwrite($log, 'Streamed blurred image to: ' . $gcsPath . PHP_EOL);
     } catch (Exception $e) {
-        throw new Exception('Unable to upload blurred image to ' . $gcsPath . ': ' . $err);
+        throw new Exception('Unable to stream blurred image to ' . $gcsPath . ': ' . $err);
     }
-
-    // Delete the temporary file.
-    unlink($tempLocalPath);
 }
 // [END functions_imagemagick_blur]

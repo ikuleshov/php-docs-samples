@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace Google\Cloud\Samples\Functions\ImageMagick\Test;
 
 use PHPUnit\Framework\TestCase;
+use Google\CloudFunctions\CloudEvent;
 use Google\Cloud\TestUtils\CloudFunctionLocalTestTrait;
 
 require_once __DIR__ . '/TestCasesTrait.php';
@@ -40,29 +41,17 @@ class IntegrationTest extends TestCase
 
     /**
       * @dataProvider cases
+      * @dataProvider integrationCases
       */
     public function testFunction(
         $cloudevent,
-        $data,
         $label,
         $fileName,
         $expected,
         $statusCode
     ): void {
-        // Prepare the HTTP headers for a CloudEvent.
-        $cloudEventHeaders = [];
-        foreach ($cloudevent as $key => $value) {
-            $cloudEventHeaders['ce-' . $key] = $value;
-        }
-
         // Send an HTTP request using CloudEvent metadata.
-        $resp = $this->client->post('/', [
-            'body' => json_encode($data),
-            'headers' => $cloudEventHeaders + [
-                // Instruct the function framework to parse the body as JSON.
-                'content-type' => 'application/json'
-            ],
-        ]);
+        $resp = $this->request($cloudevent);
 
         // Confirm the status code.
         $this->assertEquals($statusCode, $resp->getStatusCode());
