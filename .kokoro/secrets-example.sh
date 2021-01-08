@@ -72,6 +72,11 @@ export DLP_DEID_KEY_NAME=projects/$GOOGLE_PROJECT_ID/locations/global/keyRings/c
 # Firestore
 export FIRESTORE_PROJECT_ID=
 
+# Functions
+export FOO=bar
+export FUNCTIONS_BUCKET=
+export BLURRED_BUCKET_NAME=
+
 # IAP
 export IAP_CLIENT_ID=
 export IAP_PROJECT_ID=
