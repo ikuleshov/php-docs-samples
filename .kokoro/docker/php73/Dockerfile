@@ -1,7 +1,7 @@
 FROM gcr.io/gcp-runtimes/ubuntu_16_0_4
 ENV PHP_DIR=/opt/php73
 ENV PHP_SRC_DIR=/usr/local/src/php73-build
-ENV PATH=${PATH}:/usr/local/bin:${PHP_DIR}/bin
+ENV PATH=${PATH}:/usr/local/bin:${PHP_DIR}/bin:~/.config/composer/vendor
 
 RUN apt-get update && \
     apt-get -y install \
@@ -21,12 +21,14 @@ RUN apt-get update && \
             libjpeg-dev \
             libkrb5-dev \
             libmcrypt-dev \
+            libmagickwand-dev \
             libpng12-dev \
             libpq-dev \
             libssl-dev \
             libxml2-dev \
             libxslt1-dev \
             libzip-dev \
+            php-imagick \
             python-ipaddr \
             wget \
             zip \
@@ -90,16 +92,17 @@ RUN ln -s /usr/lib/libc-client.a /usr/lib/x86_64-linux-gnu/libc-client.a && \
         --enable-fpm && \
         make && \
         make install && \
-        pecl install grpc && \
+        pecl install grpc imagick && \
         cp php.ini-production ${PHP_DIR}/lib/php.ini && \
         echo 'zend_extension=opcache.so' >> ${PHP_DIR}/lib/php.ini && \
         echo 'extension=grpc.so' >> ${PHP_DIR}/lib/conf.d/ext-grpc.ini && \
+        echo 'extension=imagick.so' >> ${PHP_DIR}/lib/conf.d/ext-imagick.ini && \
         php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
         php -r "if (hash_file('SHA384', 'composer-setup.php') === rtrim(file_get_contents('https://composer.github.io/installer.sig'))) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" && \
         php composer-setup.php --filename=composer --install-dir=/usr/local/bin
 
 # Install phpunit globally
-RUN composer global require phpunit/phpunit:^7.0
+RUN composer global require phpunit/phpunit:^8.0
 
 # Install Google Cloud SDK
 RUN curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz \
@@ -117,7 +120,6 @@ ENV PATH="$PATH:/root/.composer/vendor/bin:/root/google-cloud-sdk/bin"
 RUN gcloud config set app/promote_by_default false && \
     gcloud config set disable_prompts true && \
     gcloud -q components install app-engine-python && \
-    gcloud -q components install app-engine-php && \
     gcloud -q components update
 
 # Build php-cs-fixer
