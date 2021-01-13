@@ -19,13 +19,16 @@ declare(strict_types=1);
 namespace Google\Cloud\Samples\Functions\ImageMagick\Test;
 
 use Google\CloudFunctions\CloudEvent;
+use Google\Cloud\TestUtils\TestTrait;
 
 trait TestCasesTrait
 {
+    use TestTrait;
+
     public static function getDataForFile($fileName): array
     {
         return [
-            'bucket' => getenv('FUNCTIONS_BUCKET'),
+            'bucket' => self::requireEnv('FUNCTIONS_BUCKET'),
             'metageneration' => '1',
             'name' => $fileName,
             'timeCreated' => '2020-04-23T07:38:57.230Z',
@@ -38,8 +41,8 @@ trait TestCasesTrait
 
     public static function cases(): array
     {
-        $START_BUCKET_NAME = getenv('FUNCTIONS_BUCKET');
-        $BLURRED_BUCKET_NAME = getenv('BLURRED_BUCKET_NAME');
+        $START_BUCKET_NAME = self::requireEnv('FUNCTIONS_BUCKET');
+        $BLURRED_BUCKET_NAME = self::requireEnv('BLURRED_BUCKET_NAME');
 
         return [
             [
@@ -76,8 +79,8 @@ trait TestCasesTrait
 
     public static function integrationCases(): array
     {
-        $START_BUCKET_NAME = getenv('FUNCTIONS_BUCKET');
-        $BLURRED_BUCKET_NAME = getenv('BLURRED_BUCKET_NAME');
+        $START_BUCKET_NAME = self::requireEnv('FUNCTIONS_BUCKET');
+        $BLURRED_BUCKET_NAME = self::requireEnv('BLURRED_BUCKET_NAME');
 
         return [
             [
