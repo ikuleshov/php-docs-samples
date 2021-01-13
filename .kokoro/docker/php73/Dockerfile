@@ -1,7 +1,7 @@
 FROM gcr.io/gcp-runtimes/ubuntu_16_0_4
 ENV PHP_DIR=/opt/php73
 ENV PHP_SRC_DIR=/usr/local/src/php73-build
-ENV PATH=${PATH}:/usr/local/bin:${PHP_DIR}/bin:~/.config/composer/vendor
+ENV PATH=${PATH}:/usr/local/bin:${PHP_DIR}/bin
 
 RUN apt-get update && \
     apt-get -y install \
@@ -102,7 +102,7 @@ RUN ln -s /usr/lib/libc-client.a /usr/lib/x86_64-linux-gnu/libc-client.a && \
         php composer-setup.php --filename=composer --install-dir=/usr/local/bin
 
 # Install phpunit globally
-RUN composer global require phpunit/phpunit:^8.0
+RUN composer global require phpunit/phpunit:^7.0
 
 # Install Google Cloud SDK
 RUN curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz \
@@ -120,6 +120,7 @@ ENV PATH="$PATH:/root/.composer/vendor/bin:/root/google-cloud-sdk/bin"
 RUN gcloud config set app/promote_by_default false && \
     gcloud config set disable_prompts true && \
     gcloud -q components install app-engine-python && \
+    gcloud -q components install app-engine-php && \
     gcloud -q components update
 
 # Build php-cs-fixer
