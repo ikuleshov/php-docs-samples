@@ -37,8 +37,6 @@ trait TestCasesTrait
         ];
     }
 
-
-
     public static function cases(): array
     {
         $START_BUCKET_NAME = self::requireEnv('FUNCTIONS_BUCKET');
