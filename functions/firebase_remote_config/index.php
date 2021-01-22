@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2016 Google Inc.
+ * Copyright 2020 Google LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,18 @@
  * limitations under the License.
  */
 
-// Install composer dependencies with "composer install"
-// @see http://getcomposer.org for more information.
-require __DIR__ . '/vendor/autoload.php';
+// [START functions_firebase_remote_config]
 
-$app = require __DIR__ . '/app.php';
+use Google\CloudFunctions\CloudEvent;
 
-// Run the app!
-// use "gcloud app deploy"
-$app['debug'] = true;
-$app->run();
+function firebaseRemoteConfig(CloudEvent $cloudevent)
+{
+    $log = fopen(getenv('LOGGER_OUTPUT') ?: 'php://stderr', 'wb');
+    
+    $data = $cloudevent->getData();
+
+    fwrite($log, 'Update type: ' . $data['updateType'] . PHP_EOL);
+    fwrite($log, 'Origin: ' . $data['updateOrigin'] . PHP_EOL);
+    fwrite($log, 'Version: ' . $data['versionNumber'] . PHP_EOL);
+}
+// [END functions_firebase_remote_config]
