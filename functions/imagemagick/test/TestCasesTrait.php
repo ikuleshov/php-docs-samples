@@ -39,8 +39,7 @@ trait TestCasesTrait
 
     public static function cases(): array
     {
-        $START_BUCKET_NAME = self::requireEnv('FUNCTIONS_BUCKET');
-        $BLURRED_BUCKET_NAME = self::requireEnv('BLURRED_BUCKET_NAME');
+        $bucketName = self::requireEnv('BLURRED_BUCKET_NAME');
 
         return [
             [
@@ -68,7 +67,7 @@ trait TestCasesTrait
                 'fileName' => 'zombie.jpg',
                 'expected' => sprintf(
                     'Streamed blurred image to: gs://%s/zombie.jpg',
-                    $BLURRED_BUCKET_NAME
+                    $bucketName
                 ),
                 'statusCode' => '200'
             ],
@@ -77,8 +76,7 @@ trait TestCasesTrait
 
     public static function integrationCases(): array
     {
-        $START_BUCKET_NAME = self::requireEnv('FUNCTIONS_BUCKET');
-        $BLURRED_BUCKET_NAME = self::requireEnv('BLURRED_BUCKET_NAME');
+        $bucketName = self::requireEnv('FUNCTIONS_BUCKET');
 
         return [
             [
@@ -93,7 +91,7 @@ trait TestCasesTrait
                 'filename' => 'does-not-exist.jpg',
                 'expected' => sprintf(
                     'Could not find gs://%s/does-not-exist.jpg',
-                    $START_BUCKET_NAME
+                    $bucketName
                 ),
                 'statusCode' => '200'
             ],

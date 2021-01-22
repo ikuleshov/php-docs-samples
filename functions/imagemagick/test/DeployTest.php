@@ -51,16 +51,16 @@ class DeployTest extends TestCase
 
     /** @var string */
     // The test starts by copying images from this bucket.
-    private static $FIXTURE_SOURCE_BUCKET = 'cloud-devrel-public';
+    private const FIXTURE_SOURCE_BUCKET = 'cloud-devrel-public';
 
     /** @var string */
     // This is the bucket the deployed function monitors.
     // The test copies image from FIXTURE_SOURCE_BUCKET to this one.
-    private static $MONITORED_BUCKET;
+    private static $monitoredBucket;
 
     /** @var string */
     // The function saves any blurred images to this bucket.
-    private static $BLURRED_BUCKET;
+    private static $blurredBucket;
 
     /** @var StorageClient */
     private static $storageClient;
@@ -79,10 +79,11 @@ class DeployTest extends TestCase
         $statusCode
     ): void {
         // Upload target file.
-        $fixtureBucket = self::$storageClient->bucket(self::$FIXTURE_SOURCE_BUCKET);
+        var_dump(self::FIXTURE_SOURCE_BUCKET);
+        $fixtureBucket = self::$storageClient->bucket(self::FIXTURE_SOURCE_BUCKET);
         $object = $fixtureBucket->object($fileName);
 
-        $object->copy(self::$MONITORED_BUCKET, ['name' => $fileName]);
+        $object->copy(self::$monitoredBucket, ['name' => $fileName]);
 
         // Give event and log systems a head start.
         // If log retrieval fails to find logs for our function within retry limit, increase sleep time.
@@ -155,11 +156,11 @@ class DeployTest extends TestCase
     private static function doDeploy()
     {
         // Initialize variables
-        if (empty(self::$MONITORED_BUCKET)) {
-            self::$MONITORED_BUCKET = self::requireEnv('FUNCTIONS_BUCKET');
+        if (empty(self::$monitoredBucket)) {
+            self::$monitoredBucket = self::requireEnv('FUNCTIONS_BUCKET');
         }
-        if (empty(self::$BLURRED_BUCKET)) {
-            self::$BLURRED_BUCKET = self::requireEnv('BLURRED_BUCKET_NAME');
+        if (empty(self::$blurredBucket)) {
+            self::$blurredBucket = self::requireEnv('BLURRED_BUCKET_NAME');
         }
 
         if (empty(self::$storageClient)) {
@@ -167,12 +168,12 @@ class DeployTest extends TestCase
         }
 
         // Forward required env variables to Cloud Functions.
-        $envVars = 'FUNCTIONS_BUCKET=' . self::$MONITORED_BUCKET . ',';
-        $envVars .= 'BLURRED_BUCKET_NAME=' . self::$BLURRED_BUCKET;
+        $envVars = 'FUNCTIONS_BUCKET=' . self::$monitoredBucket . ',';
+        $envVars .= 'BLURRED_BUCKET_NAME=' . self::$blurredBucket;
 
         self::$fn->deploy(
             ['--update-env-vars' => $envVars],
-            '--trigger-bucket=' . self::$MONITORED_BUCKET
+            '--trigger-bucket=' . self::$monitoredBucket
         );
     }
 }

@@ -48,16 +48,15 @@ function blurOffensiveImages(CloudEvent $cloudevent): void
             return;
         }
 
-        $VERY_LIKELY = 5; // constant used by vision API
-        $is_inappropriate =
+        $isInappropriate =
             $response->getAdult() === Likelihood::VERY_LIKELY ||
             $response->getViolence() === Likelihood::VERY_LIKELY;
 
-        if ($is_inappropriate) {
+        if ($isInappropriate) {
             fwrite($log, 'Detected ' . $data['name'] . ' as inappropriate.' . PHP_EOL);
-            $BLURRED_BUCKET_NAME = getenv('BLURRED_BUCKET_NAME');
+            $blurredBucketName = getenv('BLURRED_BUCKET_NAME');
 
-            blurImage($log, $file, $BLURRED_BUCKET_NAME);
+            blurImage($log, $file, $blurredBucketName);
         } else {
             fwrite($log, 'Detected ' . $data['name'] . ' as OK.' . PHP_EOL);
         }
