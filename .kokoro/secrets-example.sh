@@ -73,7 +73,6 @@ export DLP_DEID_KEY_NAME=projects/$GOOGLE_PROJECT_ID/locations/global/keyRings/c
 export FIRESTORE_PROJECT_ID=
 
 # Functions
-export FOO=bar
 export FUNCTIONS_BUCKET=
 export BLURRED_BUCKET_NAME=
 
