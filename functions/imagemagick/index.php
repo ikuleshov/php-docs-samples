@@ -100,7 +100,12 @@ function blurImage(
         ]);
         fwrite($log, 'Streamed blurred image to: ' . $gcsPath . PHP_EOL);
     } catch (Exception $e) {
-        throw new Exception('Unable to stream blurred image to ' . $gcsPath . ': ' . $err);
+        throw new Exception(
+            sprintf('Unable to stream blurred image to %s: %s',
+                $gcsPath,
+                $e->getMessage()
+            )
+        );
     }
 }
 // [END functions_imagemagick_blur]

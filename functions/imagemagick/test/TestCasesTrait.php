@@ -48,11 +48,11 @@ trait TestCasesTrait
                     'source' => 'storage.googleapis.com',
                     'specversion' => '1.0',
                     'type' => 'google.cloud.storage.object.v1.finalized',
-                    'data' => TestCasesTrait::getDataForFile('puppies.jpg'),
+                    'data' => TestCasesTrait::getDataForFile('functions/puppies.jpg'),
                 ]),
                 'label' => 'Ignores safe images',
-                'fileName' => 'puppies.jpg',
-                'expected' => 'Detected puppies.jpg as OK',
+                'fileName' => 'functions/puppies.jpg',
+                'expected' => 'Detected functions/puppies.jpg as OK',
                 'statusCode' => '200'
             ],
             [
@@ -61,12 +61,12 @@ trait TestCasesTrait
                     'source' => 'storage.googleapis.com',
                     'specversion' => '1.0',
                     'type' => 'google.cloud.storage.object.v1.finalized',
-                    'data' => TestCasesTrait::getDataForFile('zombie.jpg'),
+                    'data' => TestCasesTrait::getDataForFile('functions/zombie.jpg'),
                 ]),
                 'label' => 'Blurs offensive images',
-                'fileName' => 'zombie.jpg',
+                'fileName' => 'functions/zombie.jpg',
                 'expected' => sprintf(
-                    'Streamed blurred image to: gs://%s/zombie.jpg',
+                    'Streamed blurred image to: gs://%s/functions/zombie.jpg',
                     $bucketName
                 ),
                 'statusCode' => '200'
