@@ -79,7 +79,6 @@ class DeployTest extends TestCase
         $statusCode
     ): void {
         // Upload target file.
-        var_dump(self::FIXTURE_SOURCE_BUCKET);
         $fixtureBucket = self::$storageClient->bucket(self::FIXTURE_SOURCE_BUCKET);
         $object = $fixtureBucket->object($fileName);
 
